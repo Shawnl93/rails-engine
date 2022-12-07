@@ -62,4 +62,5 @@ describe "Merchants API" do
       expect(item[:merchant_id]).to be_an(Integer)
     end
   end
+
 end
