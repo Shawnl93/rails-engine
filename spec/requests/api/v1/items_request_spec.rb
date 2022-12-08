@@ -74,4 +74,31 @@ describe "Items API" do
     expect(created_item.unit_price).to eq(item_params[:unit_price])
     expect(created_item.merchant_id).to eq(item_params[:merchant_id])
   end
+
+  it "it can update an existing item" do
+    item_id = create(:item).id
+    previous_name = Item.last.name
+    item_params = { name: "Laptop"}
+    headers = {"CONTENT_TYPE" => "application/json"}
+
+    patch "/api/v1/items/#{item_id}", headers: headers, params: JSON.generate({item: item_params})
+    item = Item.find_by(id: item_id)
+
+    expect(response).to be_successful
+    expect(item.name).to_not eq(previous_name)
+    expect(item.name).to eq("Laptop")
+  end
+
+  it "it can desroy an item" do
+    item = create(:item)
+
+    expect(Item.count).to eq(1)
+
+    expect{ delete "/api/v1/items/#{item.id}"}.to change(Item, :count).by(-1)
+
+    expect(response).to be_successful
+    expect(Item.count).to eq(0)
+    expect{Item.find(item.id)}.to raise_error(ActiveRecord::RecordNotFound)
+  end
+
 end
