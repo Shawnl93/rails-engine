@@ -108,17 +108,77 @@ describe "Items API" do
 
     get "/api/v1/items/#{item_id}/merchant"
 
-    merch_id = JSON.parse(response.body, symbolize_names: true)
+    merchant = JSON.parse(response.body, symbolize_names: true)
     expect(response).to be_successful
-    expect(merch_id.count).to eq(1)
-    expect(merch_id[:data]).to have_key(:id)
+    expect(merchant.count).to eq(1)
+    expect(merchant[:data]).to have_key(:id)
 
-    expect(merch_id[:data]).to have_key(:type)
-    expect(merch_id[:data][:type]).to be_an(String)
-    expect(merch_id[:data][:attributes]).to have_key(:name)
-    expect(merch_id[:data][:attributes][:name]).to be_an(String)
+    expect(merchant[:data]).to have_key(:type)
+    expect(merchant[:data][:type]).to be_an(String)
+    expect(merchant[:data][:attributes]).to have_key(:name)
+    expect(merchant[:data][:attributes][:name]).to be_an(String)
 
+  end
 
+  it "can find all items" do
+    merchant_1 = Merchant.create(name: "Dre")
+    item_1 = Item.create(name: "Dre", description: "throoowbaaack", unit_price: 1.2, merchant_id: merchant_1.id)
+    item_2 = Item.create(name: "Snoop Dog", description: "throoowbaaack", unit_price: 1.2, merchant_id: merchant_1.id)
+    item_3 = Item.create(name: "Eminem", description: "throoowbaaack", unit_price: 1.2, merchant_id: merchant_1.id)
+    item_4 = Item.create(name: "Slim Shady", description: "throoowbaaack", unit_price: 1.2, merchant_id: merchant_1.id)
+    item_5 = Item.create(name: "Marshall", description: "throoowbaaack", unit_price: 1.2, merchant_id: merchant_1.id)
+    get "/api/v1/items/find_all?name=m"
+
+    items = JSON.parse(response.body, symbolize_names: true)
+    expect(response).to be_successful
+    expect(items[:data].count).to eq(3)
+    items[:data].each do |item|
+      expect(item[:attributes]).to have_key(:name)
+      expect(item[:attributes][:name]).to be_an(String)
+      expect(item[:attributes]).to have_key(:description)
+      expect(item[:attributes][:description]).to be_an(String)
+      expect(item[:attributes]).to have_key(:unit_price)
+      expect(item[:attributes][:unit_price]).to be_an(Float)
+      expect(item[:attributes]).to have_key(:merchant_id)
+      expect(item[:attributes][:merchant_id]).to be_an(Integer)
+    end
+  end
+
+  it "can find item by min unit price" do
+    merchant_1 = Merchant.create(name: "Dre")
+    item_1 = Item.create(name: "Dre", description: "throoowbaaack", unit_price: 151, merchant_id: merchant_1.id)
+    item_2 = Item.create(name: "Snoop Dog", description: "throoowbaaack", unit_price: 150, merchant_id: merchant_1.id)
+    item_3 = Item.create(name: "Eminem", description: "throoowbaaack", unit_price: 60, merchant_id: merchant_1.id)
+    item_4 = Item.create(name: "Slim Shady", description: "throoowbaaack", unit_price: 50, merchant_id: merchant_1.id)
+    item_5 = Item.create(name: "Marshall", description: "throoowbaaack", unit_price: 49, merchant_id: merchant_1.id)
+    get "/api/v1/items/find?min_price=50"
+
+    items = JSON.parse(response.body, symbolize_names: true)
+    binding.pry
+  end
+
+  it "can find item by max unit price" do
+    merchant_1 = Merchant.create(name: "Dre")
+    item_1 = Item.create(name: "Dre", description: "throoowbaaack", unit_price: 151, merchant_id: merchant_1.id)
+    item_2 = Item.create(name: "Snoop Dog", description: "throoowbaaack", unit_price: 150, merchant_id: merchant_1.id)
+    item_3 = Item.create(name: "Eminem", description: "throoowbaaack", unit_price: 60, merchant_id: merchant_1.id)
+    item_4 = Item.create(name: "Slim Shady", description: "throoowbaaack", unit_price: 50, merchant_id: merchant_1.id)
+    item_5 = Item.create(name: "Marshall", description: "throoowbaaack", unit_price: 49, merchant_id: merchant_1.id)
+    get "/api/v1/items/find?max_price=150"
+
+    items = JSON.parse(response.body, symbolize_names: true)
+  end
+
+  it "can find item by range unit price" do
+    merchant_1 = Merchant.create(name: "Dre")
+    item_1 = Item.create(name: "Dre", description: "throoowbaaack", unit_price: 151, merchant_id: merchant_1.id)
+    item_2 = Item.create(name: "Snoop Dog", description: "throoowbaaack", unit_price: 150, merchant_id: merchant_1.id)
+    item_3 = Item.create(name: "Eminem", description: "throoowbaaack", unit_price: 60, merchant_id: merchant_1.id)
+    item_4 = Item.create(name: "Slim Shady", description: "throoowbaaack", unit_price: 50, merchant_id: merchant_1.id)
+    item_5 = Item.create(name: "Marshall", description: "throoowbaaack", unit_price: 49, merchant_id: merchant_1.id)
+    get "/api/v1/items/find?max_price=150&min_price=50"
+
+    items = JSON.parse(response.body, symbolize_names: true)
   end
 
 end

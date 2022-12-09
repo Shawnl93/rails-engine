@@ -13,4 +13,14 @@ RSpec.describe Merchant, type: :model do
   describe 'validations' do
     it {should validate_presence_of(:name)}
   end
+
+  it "should search for One merchant by matching name" do
+    merchant_1 = Merchant.create(name: "Dre")
+    merchant_2 = Merchant.create(name: "Snoop Dog")
+    merchant_3 = Merchant.create(name: "Eminem ")
+    merchant_4 = Merchant.create(name: "Slim Shady")
+    merchant_5 = Merchant.create(name: "Marshall")
+
+    expect(Merchant.search("m")).to eq(merchant_3)
+  end
 end

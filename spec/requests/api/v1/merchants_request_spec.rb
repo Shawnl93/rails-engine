@@ -38,7 +38,6 @@ describe "Merchants API" do
   it "get all items for merchant" do
     merch_id = create(:merchant).id
     create_list(:item, 10, merchant_id: merch_id)
-
     get "/api/v1/merchants/#{merch_id}/items"
 
     items = JSON.parse(response.body, symbolize_names: true)
@@ -60,6 +59,24 @@ describe "Merchants API" do
       expect(item[:attributes]).to have_key(:merchant_id)
       expect(item[:attributes][:merchant_id]).to be_an(Integer)
     end
+  end
+
+
+  it "search one merchant" do
+    merchant_1 = Merchant.create(name: "Dre")
+    merchant_2 = Merchant.create(name: "Snoop Dog")
+    merchant_3 = Merchant.create(name: "Eminem")
+    merchant_4 = Merchant.create(name: "Slim Shady")
+    merchant_5 = Merchant.create(name: "Marshall")
+
+    get "/api/v1/merchants/find?name=m"
+
+    merchant = JSON.parse(response.body, symbolize_names: true)
+    expect(response).to be_successful
+    expect(merchant.count).to eq(1)
+    expect(merchant[:data][:attributes]).to have_key(:name)
+    expect(merchant[:data][:attributes][:name]).to be_an(String)
+    expect(merchant[:data][:attributes][:name]).to eq("Eminem")
   end
 
 end
