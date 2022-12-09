@@ -8,4 +8,8 @@ class Merchant < ApplicationRecord
 
   validates_presence_of :name
 
+  def self.search(name)
+    self.order(:name).where("name iLIKE?", "%#{name}%").first
+  end
+
 end
