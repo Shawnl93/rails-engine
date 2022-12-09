@@ -64,7 +64,7 @@ describe "Items API" do
     headers = {"CONTENT_TYPE" => "application/json"}
 
     post "/api/v1/items", headers: headers, params: JSON.generate(item: item_params)
-    binding.pry
+
     created_item = Item.last
     expect(response).to be_successful
     expect(created_item.name).to eq(item_params[:name])
